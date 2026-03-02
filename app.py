@@ -25,14 +25,18 @@ def home():
 def login():
     return "<h1>Login Page</h1>"
 
-@app.route('/signup')
+@app.route('/student_signup')
 def signup():
-    return "<h1>Sign Up Page</h1>"
+    return "<h1>Sign Up Page for students</h1>"
+
+@app.route('/company_signup')
+def signup():
+    return "<h1>Sign Up Page for companies</h1>"
 
 #iffy
-@app.route('/setup')
-def setup():
-    return "<h1>Initial Setup Page</h1>"
+# @app.route('/setup')
+# def setup():
+#     return "<h1>Initial Setup Page</h1>"
 
 
 
@@ -92,6 +96,10 @@ def history():
 def profile():
     return "<h1>Student Profile Page</h1> <h5>can be accessed by student only</h5>"
 
+@app.route('/edit_profile')
+def edit_profile():
+    return "<h1>Edit Student Profile Page</h1> <h5>can be accessed by student only</h5>"
+
 # @app.route('/editprofile')
 # def editprofile():
 #     return "<h1>Edit Student Profile Page</h1>"
@@ -136,6 +144,7 @@ if __name__ == '__main__':
         admin = User.query.filter_by(role='admin').first()
         if not admin:
             admin = User(
+                user_id = 1000,
                 username='admin',
                 email='24f3001002@ds.study.iitm.ac.in',
                 password_hash='password1526',
