@@ -7,6 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///taskmaster.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+from models import *
+
 
 #mian stufff
 @app.route('/')
@@ -118,7 +125,23 @@ def profile():
 
 
 
+
+
 if __name__ == '__main__':
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
+
+    #make admin user after!!!!!
+    from models import User
+    admin = User.query.filter_by(role='admin').first()
+    if not admin:
+        admin = User(
+            username='admin',
+            email='24f3001002@ds.study.iitm.ac.in',
+            password_hash='password1526',
+            role='admin'
+            )
+        db.session.add(admin)
+        db.session.commit()
+
     app.run(debug=True)
