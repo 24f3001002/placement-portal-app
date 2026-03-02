@@ -1,8 +1,9 @@
-from app import db
-
+from extensions import db
 class User(db.Model):
     __tablename__ = 'users'
+
     user_id = db.Column(db.Integer, primary_key = True)
+
     username = db.Column(db.String(50), unique = True, nullable  = False)
     email = db.Column(db.String(100), unique = True, nullable = False)
     password_hash = db.Column(db.String(200), nullable = False)
@@ -13,8 +14,11 @@ class User(db.Model):
 
 class Student(db.Model):
     __tablename__ = 'students'
+
     student_id = db.Column(db.Integer, primary_key=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
+
     f_name = db.Column(db.String(20))
     l_name = db.Column(db.String(20))
     department = db.Column(db.String(100))
@@ -27,15 +31,19 @@ class Student(db.Model):
 
 class Company(db.Model):
     __tablename__ = 'companies'
+
     company_id = db.Column(db.Integer, primary_key=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
+
     company_name = db.Column(db.String(100), nullable=False)
     hr_fname = db.Column(db.String(20), nullable=False)
     hr_lname = db.Column(db.String(20), nullable=False)
     hr_email = db.Column(db.String(100), nullable=False)
     website = db.Column(db.Text)
     description = db.Column(db.Text)
-    approval_status = db.Column(db.String(8), default='pending')  # pending/approved/rejected
+    logo_path = db.Column(db.String(200))
+    approval_status = db.Column(db.String(8), default='pending')  # sjortlist, waiting(applied), reject
     is_blacklisted = db.Column(db.Boolean, default=False)
 
 
@@ -43,9 +51,31 @@ class Company(db.Model):
 
 class PlacementDrive(db.Model):
     __tablename__ = 'placement_drives'
-    
+
+    drive_id = db.Column(db.Integer, primary_key=True)
+
+    company_id = db.Column(db.Integer, db.ForeignKey('companies.company_id'))
+
+    drive_name = db.Column(db.String(100), nullable=False)
+    job_title = db.Column(db.String(100), nullable=False)
+    job_description = db.Column(db.Text, nullable=False)
+    eligibility_criteria = db.Column(db.Text, nullable=False)
+    salary = db.Column(db.Float, nullable=False)
+    location = db.Column(db.String(150), nullable=False)
+    deadline = db.Column(db.DateTime, nullable=False)
+    create_time = db.Column(db.DateTime, default=db.func.current_timestamp())
+    status = db.Column(db.String(8), default='pending') #pending, complete
 
 
 
 class Application(db.Model):
     __tablename__ = 'applications'
+
+    aplication_id = db.Column(db.Integer, primary_key=True)
+
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
+    drive_id = db.Column(db.Integer, db.ForeignKey('placement_drives.drive_id'))
+
+    applied_time = db.Column(db.DateTime, default=db.func.current_timestamp())
+    status = db.Column(db.String(11), default='waiting')  # shortlist, waiting, reject
+    remarks = db.Column(db.Text)
