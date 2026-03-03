@@ -20,8 +20,8 @@ class Student(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
     email = db.Column(db.String(100), db.ForeignKey('users.email'), unique=True, nullable=False)
 
-    f_name = db.Column(db.String(20))
-    l_name = db.Column(db.String(20))
+    f_name = db.Column(db.String(20), nullable=False)
+    l_name = db.Column(db.String(20), nullable=False)
     department = db.Column(db.String(100))
     cgpa = db.Column(db.Float)
     phone = db.Column(db.String(10))
