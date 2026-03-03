@@ -4,7 +4,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key = True)
 
-    username = db.Column(db.String(50), unique = True, nullable  = False)
+    username = db.Column(db.String(20), unique = True, nullable  = False)
     email = db.Column(db.String(100), unique = True, nullable = False)
     password_hash = db.Column(db.String(200), nullable = False)
     role = db.Column(db.String(7), nullable = False) #company/student
@@ -18,13 +18,14 @@ class Student(db.Model):
     student_id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
+    email = db.Column(db.String(100), db.ForeignKey('users.email'), unique=True, nullable=False)
 
     f_name = db.Column(db.String(20))
     l_name = db.Column(db.String(20))
     department = db.Column(db.String(100))
     cgpa = db.Column(db.Float)
-    phone = db.Column(db.String(20))
-    resume_path = db.Column(db.String(200))
+    phone = db.Column(db.String(10))
+    resume = db.Column(db.String(200))
     is_blacklisted = db.Column(db.Boolean, default=False)
 
 
@@ -35,6 +36,7 @@ class Company(db.Model):
     company_id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
+    email = db.Column(db.String(100), db.ForeignKey('users.email'), unique=True, nullable=False)
 
     company_name = db.Column(db.String(100), nullable=False)
     hr_fname = db.Column(db.String(20), nullable=False)
@@ -42,8 +44,8 @@ class Company(db.Model):
     hr_email = db.Column(db.String(100), nullable=False)
     website = db.Column(db.Text)
     description = db.Column(db.Text)
-    logo_path = db.Column(db.String(200))
-    approval_status = db.Column(db.String(8), default='pending')  # sjortlist, waiting(applied), reject
+    logo = db.Column(db.String(200))
+    approval_status = db.Column(db.String(8), default='pending')  # shortlist, waiting(applied), reject
     is_blacklisted = db.Column(db.Boolean, default=False)
 
 

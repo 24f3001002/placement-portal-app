@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Signup</title>
+</head>
+<body>
+    <h1>Sign Up to get job!</h1>
+
+    <input type="text"
+           name="f_name"
+           placeholder="Enter first name"
+           minlength="1"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="text"
+           name="l_name"
+           placeholder="Enter last name"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="text"
+           name="username"
+           placeholder="Enter username"
+           minlength="5"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="password"
+           name="password"
+           placeholder="Enter password"
+           minlength="5"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="text"
+           name="department"
+           placeholder="Enter your department"
+           maxlength="100"
+           required>
+    <br><br>
+    
+    <input type="float"
+           name="cgpa"
+           placeholder="Enter your cgpa"
+           min="0.0"
+           max="10.0"
+           step="0.1"
+           required>
+    <br><br>
+
+    <input type="text"
+           name="phone"
+           placeholder="Enter phone number"
+           pattern= "\d{10}"
+           required>
+    <br><br>
+
+    <input enctype="multipart/form-data"
+           type="file"
+           name="resume"
+           accept=".pdf"
+           required>
+    <button type="button">Upload</button>
+    <br><br>
+
+    <button type="button">Sign Up</button>
+    <br><br>
+
+    <a href="index.html">Go back to Home Page</a>
+</body>
+</html>

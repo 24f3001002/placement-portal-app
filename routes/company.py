@@ -16,3 +16,13 @@ def drivelist():
 def createdrive():
     return render_template('createdrive.html')
     #return "<h1>Create Drive Page</h1><h5>can be accessed by company only</h5>"
+
+@company.route('/company_profile')
+def company_profile():
+    return render_template('company_profile.html')
+    #return "<h1>Company Profile Page</h1><h5>can be accessed by company only</h5>"
+
+@company.route('/company_edit_profile')
+def company_edit_profile():
+    return render_template('company_edit_profile.html')
+    #return "<h1>Company Edit Profile Page</h1><h5>can be accessed by company and company profile only</h5>"

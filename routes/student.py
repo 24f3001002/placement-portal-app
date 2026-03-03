@@ -18,12 +18,12 @@ def history():
     #return "<h1>Student Application History Page</h1><h5>can be accessed by student only</h5>"
 
 
-@student.route('/profile')
+@student.route('/student_profile')
 def profile():
-    return render_template('profile.html')
+    return render_template('student_profile.html')
     #return "<h1>Student Profile Page</h1> <h5>can be accessed by student only</h5>"
 
-@student.route('/edit_profile')
+@student.route('/student_edit_profile')
 def edit_profile():
-    return render_template('edit_profile.html')
-    #return "<h1>Edit Student Profile Page</h1> <h5>can be accessed by student only</h5>"
+    return render_template('student_edit_profile.html')
+    #return "<h1>Edit Student Profile Page</h1> <h5>can be accessed by student and student profile only</h5>"
