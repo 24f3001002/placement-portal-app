@@ -7,6 +7,95 @@
 </head>
 <body>
     <h1>Hire our best talents!</h1>
-    
+
+    <input type="text"
+            name="company_name"
+            placeholder="Enter company name"
+            maxlength="100"
+            required>
+    <br><br>
+
+    <input type="text"
+           name="hr_fname"
+           placeholder="Enter HR first name"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="text"
+           name="hr_lname"
+           placeholder="Enter HR last name"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="email"
+           name="hr_email"
+           placeholder="Enter HR email"
+           maxlength="100"
+           required>
+    <br><br>
+
+    <p>Website: </p>
+    <input type="url"
+           name="website"
+           placeholder="https://example.com"
+           maxlength="200">
+    <br><br>
+
+    <input type="text"
+           name="description"
+           placeholder="Enter company description">
+    <br><br>
+
+    #input logo <br><br>
+    <input type="file"
+           name="logo"
+           accept="image/*"
+           required>
+    <button type="submit">Upload</button>
+    <br><br>
+
+    <input type="text"
+           name="username"
+           placeholder="Enter username"
+           minlength="5"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <input type="email"
+           name="email"
+           placeholder="Enter email"
+           maxlength="50"
+           required>
+    <br><br>
+
+    <input type="password"
+           name="password"
+           placeholder="Enter password"
+           minlength="5"
+           maxlength="20"
+           required>
+    <br><br>
+
+    <a href="index.html">Go back to Home Page</a>
+
 </body>
 </html>
+
+
+
+<!-- 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True)
+    email = db.Column(db.String(100), db.ForeignKey('users.email'), unique=True, nullable=False)
+
+    company_name = db.Column(db.String(100), nullable=False)
+    hr_fname = db.Column(db.String(20), nullable=False)
+    hr_lname = db.Column(db.String(20), nullable=False)
+    hr_email = db.Column(db.String(100), nullable=False)
+    website = db.Column(db.Text)
+    description = db.Column(db.Text)
+    logo = db.Column(db.String(200))
+    approval_status = db.Column(db.String(8), default='pending')  # shortlist, waiting(applied), reject
+    is_blacklisted = db.Column(db.Boolean, default=False) -->
