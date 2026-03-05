@@ -15,9 +15,9 @@
     {% endwith %}
 
     <form action="{{ url_for('auth.login') }}" method="POST">
-        <input type="text"
-               name="user_id"
-               placeholder="Enter user ID"
+        <input type="email"
+               name="email"
+               placeholder="Enter email"
                required>
         <br><br>
 

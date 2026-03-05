@@ -22,15 +22,15 @@ ALLOWED_LOGO = {'png', 'jpg', 'jpeg'}
 def login():
     if request.method == 'POST':
         
-        user_id   = request.form.get('user_id', '').strip()
+        email   = request.form.get('email', '').strip()
         password  = request.form.get('password', '').strip()
 
 
-        user = User.query.filter_by(user_id=user_id).first()
+        user = User.query.filter_by(email=email).first()
 
 
         if not user or not check_password_hash(user.password_hash, password):
-            flash('Invalid user ID or password.', 'error')
+            flash('Invalid email or password.', 'error')
             return redirect(url_for('auth.login'))
 
 

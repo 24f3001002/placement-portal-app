@@ -31,9 +31,9 @@ app.register_blueprint(auth)
 from models import *
 
 
-@app.route('/test')
-def test():
-    return render_template('index.html')
+# @app.route('/test')
+# def test():
+#     return render_template('index.html')
 
 #mian stufff
 @app.route('/')
@@ -65,4 +65,5 @@ if __name__ == '__main__':
             db.session.add(admin)
             db.session.commit()
 
+    print(app.url_map)
     app.run(debug=True)
