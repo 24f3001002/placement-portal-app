@@ -1,0 +1,62 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>{{ student.f_name }} {{ student.l_name }} — Application History</title>
+</head>
+<body>
+
+<p><a href="{{ url_for('admin.dashboard') }}">← Back to Dashboard</a></p>
+<h1>Student Application History</h1>
+<hr>
+
+<h2>{{ student.f_name }} {{ student.l_name }}</h2>
+<p>
+  <strong>Email:</strong> {{ student.email }}<br>
+  <strong>Department:</strong> {{ student.department or '—' }}<br>
+  <strong>CGPA:</strong> {{ student.cgpa or '—' }}<br>
+  <strong>Phone:</strong> {{ student.phone or '—' }}<br>
+  <strong>Status:</strong> {% if student.is_blacklisted %}Blacklisted{% else %}Active{% endif %}<br>
+  {% if student.resume %}
+  <strong>Resume:</strong> <a href="{{ student.resume }}" target="_blank">View Resume</a>
+  {% endif %}
+</p>
+<hr>
+
+<h2>Applications ({{ applications|length }})</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Drive Name</th>
+      <th>Company</th>
+      <th>Job Title</th>
+      <th>Salary</th>
+      <th>Location</th>
+      <th>Applied On</th>
+      <th>Result</th>
+      <th>Remarks</th>
+      <th>Drive</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app, drive, company in applications %}
+    <tr>
+      <td>{{ drive.drive_name }}</td>
+      <td>{{ company.company_name }}</td>
+      <td>{{ drive.job_title }}</td>
+      <td>{{ drive.salary }}</td>
+      <td>{{ drive.location }}</td>
+      <td>{{ app.applied_time.strftime('%d %b %Y') if app.applied_time else '—' }}</td>
+      <td>{{ app.status|capitalize }}</td>
+      <td>{{ app.remarks or '—' }}</td>
+      <td><a href="{{ url_for('admin.drive_detail', drive_id=drive.drive_id) }}">View Drive</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9">No applications found for this student.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html> -->

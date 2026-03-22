@@ -1,0 +1,230 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Admin Dashboard</title>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+<p>Welcome, Admin | <a href="{{ url_for('auth.logout') }}">Logout</a></p>
+<hr>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <p><strong>[{{ category }}]</strong> {{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<p>
+  Jump to:
+  <a href="#companies">Registered Companies</a> |
+  <a href="#pending">Pending Approvals</a> |
+  <a href="#drives">All Drives</a> |
+  <a href="#students">Students</a> |
+  <a href="#applications">Applications</a>
+</p>
+<hr>
+
+
+<!-- 1. Registered Companies ->
+<h2 id="companies">1. Registered Companies</h2>
+<p>Search: <input type="text" placeholder="Search by company name" oninput="filterTable('tbl-companies', this.value, 0)"/></p>
+<table id="tbl-companies" border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Company Name</th>
+      <th>HR Contact</th>
+      <th>HR Email</th>
+      <th>Open Drives</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in companies %}
+    {% set open_drives = drives|selectattr('company_id','eq',c.company_id)|selectattr('status','eq','pending')|list %}
+    <tr>
+      <td>{{ c.company_name }}</td>
+      <td>{{ c.hr_fname }} {{ c.hr_lname }}</td>
+      <td>{{ c.hr_email }}</td>
+      <td>{{ open_drives|length }} open</td>
+      <td>{% if c.is_blacklisted %}Blacklisted{% else %}Active{% endif %}</td>
+      <td>
+        <form method="POST" action="{{ url_for('admin.blacklist_company', company_id=c.company_id) }}" style="display:inline;">
+          <button type="submit">{% if c.is_blacklisted %}Reinstate{% else %}Blacklist{% endif %}</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No approved companies yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+
+
+<!-- 2. Pending Approvals ->
+<h2 id="pending">2. Company Approvals (Pending)</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Company Name</th>
+      <th>HR Name</th>
+      <th>HR Email</th>
+      <th>Website</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in pending_companies %}
+    <tr>
+      <td>{{ c.company_name }}</td>
+      <td>{{ c.hr_fname }} {{ c.hr_lname }}</td>
+      <td>{{ c.hr_email }}</td>
+      <td>{{ c.website or '—' }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('admin.approve_company', company_id=c.company_id) }}" style="display:inline;">
+          <button type="submit">Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.reject_company', company_id=c.company_id) }}" style="display:inline;">
+          <button type="submit">Reject</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No pending approvals.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+
+
+<!-- 3. All Drives ->
+<h2 id="drives">3. All Placement Drives</h2>
+<p>
+  Search: <input type="text" placeholder="Search by drive name" oninput="filterTable('tbl-drives', this.value, 1)"/>
+  &nbsp; Filter:
+  <select onchange="filterDriveStatus(this.value)">
+    <option value="all">All</option>
+    <option value="pending">Ongoing</option>
+    <option value="complete">Completed</option>
+  </select>
+</p>
+<table id="tbl-drives" border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Drive Name</th>
+      <th>Company</th>
+      <th>Job Title</th>
+      <th>Deadline</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in drives %}
+    <tr data-status="{{ d.status }}">
+      <td>{{ d.drive_id }}</td>
+      <td>{{ d.drive_name }}</td>
+      <td>{{ d.company.company_name if d.company else '—' }}</td>
+      <td>{{ d.job_title }}</td>
+      <td>{{ d.deadline.strftime('%d %b %Y') if d.deadline else '—' }}</td>
+      <td>{% if d.status == 'pending' %}Ongoing{% elif d.status == 'complete' %}Completed{% else %}Cancelled{% endif %}</td>
+      <td><a href="{{ url_for('admin.drive_detail', drive_id=d.drive_id) }}">View Details</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No drives found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+
+
+<!-- 4. Registered Students ->
+<h2 id="students">4. Registered Students</h2>
+<p>Search: <input type="text" placeholder="Search by name" oninput="filterTable('tbl-students', this.value, 0)"/></p>
+<table id="tbl-students" border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Department</th>
+      <th>CGPA</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in students %}
+    <tr>
+      <td>{{ s.f_name }} {{ s.l_name }}</td>
+      <td>{{ s.email }}</td>
+      <td>{{ s.department or '—' }}</td>
+      <td>{{ s.cgpa or '—' }}</td>
+      <td>{% if s.is_blacklisted %}Blacklisted{% else %}Active{% endif %}</td>
+      <td>
+        <form method="POST" action="{{ url_for('admin.blacklist_student', student_id=s.student_id) }}" style="display:inline;">
+          <button type="submit">{% if s.is_blacklisted %}Reinstate{% else %}Blacklist{% endif %}</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No students registered yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+
+
+<!-- 5. Student Applications ->
+<h2 id="applications">5. Student Applications</h2>
+<p>Search: <input type="text" placeholder="Search by student name" oninput="filterTable('tbl-apps', this.value, 0)"/></p>
+<table id="tbl-apps" border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Drive</th>
+      <th>Company</th>
+      <th>Applied On</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app, student, drive, company in applications %}
+    <tr>
+      <td>{{ student.f_name }} {{ student.l_name }}</td>
+      <td>{{ drive.drive_name }}</td>
+      <td>{{ company.company_name }}</td>
+      <td>{{ app.applied_time.strftime('%d %b %Y') if app.applied_time else '—' }}</td>
+      <td>{{ app.status|capitalize }}</td>
+      <td><a href="{{ url_for('admin.student_applications', student_id=student.student_id) }}">View History</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No applications yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+<script>
+  function filterTable(tableId, query, colIndex) {
+    const q = query.toLowerCase();
+    document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+      const cell = row.cells[colIndex];
+      row.style.display = cell && cell.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+  function filterDriveStatus(value) {
+    document.querySelectorAll('#tbl-drives tbody tr').forEach(row => {
+      row.style.display = (value === 'all' || row.dataset.status === value) ? '' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html> -->
