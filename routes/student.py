@@ -2,10 +2,14 @@ from flask import Blueprint, render_template
 
 student = Blueprint('student', __name__)
 
-@student.route('/student')
-def student():
+@student.route('/dashboard')
+def dashboard():
     return render_template('student.html')
-    #return "<h1>Student Dashboard</h1>"
+
+# @student.route('/student')
+# def student():
+#     return render_template('student.html')
+#     #return "<h1>Student Dashboard</h1>"
 
 @student.route('/complist')
 def complist():

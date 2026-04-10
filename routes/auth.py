@@ -27,6 +27,11 @@ def login():
 
 
         user = User.query.filter_by(email=email).first()
+        # #temppppp DEBUG!!!!#
+        # print("EMAIL ENTERED:", email)
+        # print("USER FETCHED:", user.email if user else None)
+        # print("ROLE:", user.role if user else None)
+        # #tempppppppp#
 
 
         if not user or not check_password_hash(user.password_hash, password):
@@ -43,7 +48,18 @@ def login():
         elif user.role == 'student':
             return redirect(url_for('student.dashboard'))
         elif user.role == 'company':
+            company = Company.query.filter_by(user_id=user.user_id).first()
+            if not company or company.approval_status != 1:
+                flash('Company not approved yet.', 'error')
+                return redirect(url_for('home'))
             return redirect(url_for('company.dashboard'))
+        
+    
+    #DEBUG!!!
+    # users = User.query.all()
+    # print("ALL USERS:")
+    # for u in users:
+    #     print(u.email, u.role)
 
     return render_template('login.html')
     #return "<h1>Login Page</h1>"
@@ -181,7 +197,7 @@ def company_signup():
             website         = website,
             description     = description,
             logo            = logo_path,
-            approval_status = 'pending'
+            approval_status = 0
         )
         db.session.add(new_company)
         db.session.commit()

@@ -12,9 +12,9 @@ from extensions import db
 app = Flask(__name__)
 
 from routes.auth import auth
-# from routes.admin import admin
-# from routes.company import company
-# from routes.student import student
+from routes.admin import admin
+from routes.company import company
+from routes.student import student
 
 app.config['SECRET_KEY'] = 'change-this-secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///placementapp.db'
@@ -23,9 +23,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 app.register_blueprint(auth)
-#app.register_blueprint(admin)
-#app.register_blueprint(company)
-#app.register_blueprint(student)
+app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(company, url_prefix='/company')
+app.register_blueprint(student, url_prefix='/student')
 
 
 from models import *

@@ -2,10 +2,15 @@ from flask import Blueprint, render_template
 
 company = Blueprint('company', __name__)
 
-@company.route('/company')
-def company():
+
+@company.route('/dashboard')
+def dashboard():
     return render_template('company.html')
-    #return "<h1>Company Dashboard</h1>"
+
+# @company.route('/company')
+# def company():
+#     return render_template('company.html')
+#     #return "<h1>Company Dashboard</h1>"
 
 @company.route('/drivelist')
 def drivelist():

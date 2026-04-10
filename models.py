@@ -45,7 +45,7 @@ class Company(db.Model):
     website = db.Column(db.Text)
     description = db.Column(db.Text)
     logo = db.Column(db.String(200))
-    approval_status = db.Column(db.String(8), default='pending')  # shortlist, waiting(applied), reject
+    approval_status = db.Column(db.Boolean, default=False)  # shortlist, waiting(applied), reject
     is_blacklisted = db.Column(db.Boolean, default=False)
 
 
