@@ -4,7 +4,7 @@ student = Blueprint('student', __name__)
 
 @student.route('/dashboard')
 def dashboard():
-    return render_template('student.html')
+    return render_template('student/student.html')
 
 # @student.route('/student')
 # def student():

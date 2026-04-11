@@ -43,19 +43,6 @@ def manage_companies():
         companies = companies,
         pending   = pending,
     )
-# @admin.route('/manage_companies')
-# def manage_companies():
-#     q = request.args.get('q', '').strip()
-#     if q:
-#         companies = Company.query.filter(Company.company_name.ilike(f'%{q}%')).all()
-#     else:
-#         companies = Company.query.all()
-#     return render_template('admin/manage_company.html', companies=companies)
-# # @admin.route('/manage_companies')
-# # def manage_companies():
-# #     companies = Company.query.all()
-# #     return render_template('admin/manage_company.html', companies=companies)
-
 
 @admin.route('/approve_company/<int:company_id>')
 def approve_company(company_id):
