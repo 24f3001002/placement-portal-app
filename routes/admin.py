@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 
-from models import User, Student, Company, PlacementDrive, Application# add Drive, Application when ready
+from models import User, Student, Company, PlacementDrive, Application
 
 from extensions import db
 
