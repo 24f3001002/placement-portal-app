@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ company.company_name }}</title>
+</head>
+<body>
+
+  <a href="{{ url_for('admin.manage_companies') }}">Back to Companies</a>
+
+  <h1>{{ company.company_name }}</h1>
+
+  {% if company.logo %}
+    <img src="{{ url_for('static', filename=company.logo.replace('static/', '')) }}" alt="Logo" width="100">
+  {% endif %}
+
+  <p>Website: {{ company.website }}</p>
+  <p>Description: {{ company.description }}</p>
+  <p>HR: {{ company.hr_fname }} {{ company.hr_lname }} | {{ company.hr_email }}</p>
+  <p>Status:
+    {% if company.is_blacklisted %} Blacklisted
+    {% elif company.approval_status %} Approved
+    {% else %} Pending
+    {% endif %}
+  </p>
+
+  <a href="{{ url_for('admin.blacklist_company', company_id=company.company_id) }}">
+    {% if company.is_blacklisted %} Remove Blacklist {% else %} Blacklist {% endif %}
+  </a>
+
+  <h2>Drives</h2>
+  <p>Total: {{ total_drives }} | Ongoing: {{ ongoing_drives }}</p>
+  {% for d in drives %}
+    <p>{{ loop.index }}. {{ d.drive_name }} | {{ d.job_title }} | Deadline: {{ d.deadline.strftime('%Y-%m-%d') }} |
+      {% if d.status %} Completed {% else %} Ongoing {% endif %}
+    </p>
+  {% else %}
+    <p>No drives yet.</p>
+  {% endfor %}
+
+  <p>Students Hired: {{ students_hired }}</p>
+
+</body>
+</html>

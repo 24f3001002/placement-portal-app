@@ -1,0 +1,15 @@
+auth.py
+routes: 
+login: directs to admin, student, company dashboards
+logout
+company_signup
+student_signup
+
+functions:
+login
+logout
+allowed_files
+company_signup
+student_signup
+
+

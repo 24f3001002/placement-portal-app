@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Drives</title>
+</head>
+<body>
+
+  <h1>Manage Drives</h1>
+  <a href="{{ url_for('admin.dashboard') }}">Back to Dashboard</a>
+
+  <hr>
+  <h2>Search</h2>
+  <form method="GET" action="{{ url_for('admin.manage_drives') }}">
+    <input type="text" name="q" placeholder="Search by drive or company name" value="{{ request.args.get('q', '') }}">
+    <button type="submit">Search</button>
+  </form>
+
+  <h2>Ongoing Drives</h2>
+  {% for d in ongoing_drives %}
+    <p>
+      {{ loop.index }}. {{ d.drive_name }} | {{ d.company.company_name }} | Deadline: {{ d.deadline.strftime('%Y-%m-%d') }}
+      | <a href="{{ url_for('admin.drive_detail', drive_id=d.drive_id) }}">View</a>
+      | <a href="{{ url_for('admin.complete_drive', drive_id=d.drive_id) }}">Mark Complete</a>
+    </p>
+  {% else %}
+    <p>No ongoing drives.</p>
+  {% endfor %}
+
+  <h2>Past Drives</h2>
+  {% for d in past_drives %}
+    <p>
+      {{ loop.index }}. {{ d.drive_name }} | {{ d.company.company_name }} | Deadline: {{ d.deadline.strftime('%Y-%m-%d') }}
+      | <a href="{{ url_for('admin.drive_detail', drive_id=d.drive_id) }}">View</a>
+    </p>
+  {% else %}
+    <p>No completed drives yet.</p>
+  {% endfor %}
+
+</body>
+</html>

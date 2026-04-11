@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Companies</title>
+</head>
+<body>
+
+  <h1>Manage Companies</h1>
+  <a href="{{ url_for('admin.dashboard') }}">Back to Dashboard</a>
+
+  <h2>Pending Approvals</h2>
+  {% for c in pending %}
+    <p>
+      {{ c.company_name }} | {{ c.hr_fname }} {{ c.hr_lname }} | {{ c.hr_email }}
+      <a href="{{ url_for('admin.approve_company', company_id=c.company_id) }}">Approve</a>
+      <a href="{{ url_for('admin.reject_company', company_id=c.company_id) }}">Reject</a>
+    </p>
+  {% endfor %}
+
+  <h2>All Companies</h2>
+  <form method="GET" action="{{ url_for('admin.manage_companies') }}">
+    <input type="text" name="q" placeholder="Search by company name" value="{{ request.args.get('q', '') }}">
+    <button type="submit">Search</button>
+  </form>
+  {% for c in companies %}
+    <p>
+      {{ loop.index }}. {{ c.company_name }} |
+      {% if c.is_blacklisted %} Blacklisted
+      {% elif c.approval_status %} Approved
+      {% else %} Pending
+      {% endif %}
+      | <a href="{{ url_for('admin.company_detail', company_id=c.company_id) }}">View</a>
+    </p>
+  {% endfor %}
+
+</body>
+</html>

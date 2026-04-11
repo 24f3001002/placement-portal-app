@@ -38,7 +38,7 @@ from models import *
 #mian stufff
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('auth/index.html')
     #return "<h1>Welcome to Placement Portal!</h1>"
 
 

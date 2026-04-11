@@ -27,11 +27,6 @@ def login():
 
 
         user = User.query.filter_by(email=email).first()
-        # #temppppp DEBUG!!!!#
-        # print("EMAIL ENTERED:", email)
-        # print("USER FETCHED:", user.email if user else None)
-        # print("ROLE:", user.role if user else None)
-        # #tempppppppp#
 
 
         if not user or not check_password_hash(user.password_hash, password):
@@ -61,8 +56,7 @@ def login():
     # for u in users:
     #     print(u.email, u.role)
 
-    return render_template('login.html')
-    #return "<h1>Login Page</h1>"
+    return render_template('auth/login.html')
 
 @auth.route('/logout')
 def logout():
@@ -140,8 +134,7 @@ def student_signup():
         flash('Account created! Please log in.', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('student_signup.html')
-    #return "<h1>Sign Up Page for students</h1>"
+    return render_template('auth/student_signup.html')
 
 
 
@@ -205,5 +198,4 @@ def company_signup():
         flash('Registration submitted! Wait for admin approval before logging in.', 'success')
         return redirect(url_for('auth.login'))
 
-    return render_template('company_signup.html')
-    #return "<h1>Sign Up Page for companies</h1>"
+    return render_template('auth/company_signup.html')

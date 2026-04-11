@@ -1,199 +1,208 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+
+from models import User, Student, Company, PlacementDrive, Application# add Drive, Application when ready
+
+from extensions import db
+
 
 admin = Blueprint('admin', __name__)
 
+# --- dashboard ---
 @admin.route('/dashboard')
 def dashboard():
-    return render_template('admin.html')
+    total_students    = Student.query.count()
+    total_companies   = Company.query.filter_by(approval_status=True).count()
+    pending_approvals = Company.query.filter_by(approval_status=False).count()
+    total_drives      = PlacementDrive.query.count()
+    students_placed   = Application.query.filter_by(status='shortlist').count()
+    total_applications = Application.query.count()
 
-# @admin.route('/admin')
-# def admin():
-#     return render_template('admin.html')
-#     #return "<h1>Admin Dashboard</h1>"
-
-# @admin.route('/drive')
-# def viewdrive():
-#     return render_template('drive.html')
-#     #return "<h1>Drive Page</h1><p> Descripton of specifc drive</p><h5>can be accessed by admin and student</h5>"
-
-# @admin.route('/applications')
-# def stdapplication():
-#     return render_template('applications.html')
-#     #return "<h1>Student's Drive Application</h><p> **for a specific drive</p><h5>can be accessed by admin and student</h5>"
-
-######################
-# from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-# from extensions import db
-# from models import User, Student, Company, PlacementDrive, Application
-# from functools import wraps
-# from flask_login import login_required, current_user
-
-# admin = Blueprint('admin', __name__, url_prefix='/admin')
+    return render_template('admin/admin.html',
+        total_students    = total_students,
+        total_companies   = total_companies,
+        pending_approvals = pending_approvals,
+        total_drives      = total_drives,
+        students_placed   = students_placed,
+        total_applications= total_applications
+    )
 
 
-# def admin_required(f):
-#     @wraps(f)
-#     def decorated_function(*args, **kwargs):
-#         if not current_user.is_authenticated or current_user.role != 'admin':
-#             flash('Admin access required.', 'danger')
-#             return redirect(url_for('auth.login'))
-#         return f(*args, **kwargs)
-#     return decorated_function
+#companies chunk
+@admin.route('/manage_companies')
+def manage_companies():
+    q = request.args.get('q', '').strip()
+    
+    pending   = Company.query.filter_by(approval_status=False).all()
+    
+    if q:
+        companies = Company.query.filter(Company.company_name.ilike(f'%{q}%')).all()
+    else:
+        companies = Company.query.all()
+    
+    return render_template('admin/manage_company.html',
+        companies = companies,
+        pending   = pending,
+    )
+# @admin.route('/manage_companies')
+# def manage_companies():
+#     q = request.args.get('q', '').strip()
+#     if q:
+#         companies = Company.query.filter(Company.company_name.ilike(f'%{q}%')).all()
+#     else:
+#         companies = Company.query.all()
+#     return render_template('admin/manage_company.html', companies=companies)
+# # @admin.route('/manage_companies')
+# # def manage_companies():
+# #     companies = Company.query.all()
+# #     return render_template('admin/manage_company.html', companies=companies)
 
 
-# # ─── Admin Dashboard ────────────────────────────────────────────────────────
-
-# @admin.route('/')
-# @login_required
-# @admin_required
-# def dashboard():
-#     # Registered & approved companies
-#     companies = (
-#         db.session.query(Company)
-#         .filter(Company.approval_status == 'approved')
-#         .all()
-#     )
-
-#     # Companies awaiting approval
-#     pending_companies = (
-#         db.session.query(Company)
-#         .filter(Company.approval_status == 'pending')
-#         .all()
-#     )
-
-#     # All placement drives
-#     drives = db.session.query(PlacementDrive).all()
-
-#     # All students
-#     students = db.session.query(Student).all()
-
-#     # All applications (with student + drive info)
-#     applications = (
-#         db.session.query(Application, Student, PlacementDrive, Company)
-#         .join(Student, Application.student_id == Student.student_id)
-#         .join(PlacementDrive, Application.drive_id == PlacementDrive.drive_id)
-#         .join(Company, PlacementDrive.company_id == Company.company_id)
-#         .order_by(Application.applied_time.desc())
-#         .all()
-#     )
-
-#     return render_template(
-#         'admin/admin.html',
-#         companies=companies,
-#         pending_companies=pending_companies,
-#         drives=drives,
-#         students=students,
-#         applications=applications,
-#     )
+@admin.route('/approve_company/<int:company_id>')
+def approve_company(company_id):
+    company = Company.query.get_or_404(company_id)
+    company.approval_status = True
+    db.session.commit()
+    flash(f'{company.company_name} approved.', 'success')
+    return redirect(url_for('admin.manage_companies'))
 
 
-# # ─── Company Management ──────────────────────────────────────────────────────
-
-# @admin.route('/company/<int:company_id>/approve', methods=['POST'])
-# @login_required
-# @admin_required
-# def approve_company(company_id):
-#     company = Company.query.get_or_404(company_id)
-#     company.approval_status = 'approved'
-#     db.session.commit()
-#     flash(f'{company.company_name} approved.', 'success')
-#     return redirect(url_for('admin.dashboard'))
-
-
-# @admin.route('/company/<int:company_id>/reject', methods=['POST'])
-# @login_required
-# @admin_required
-# def reject_company(company_id):
-#     company = Company.query.get_or_404(company_id)
-#     company.approval_status = 'rejected'
-#     db.session.commit()
-#     flash(f'{company.company_name} rejected.', 'warning')
-#     return redirect(url_for('admin.dashboard'))
+@admin.route('/reject_company/<int:company_id>')
+def reject_company(company_id):
+    company = Company.query.get_or_404(company_id)
+    db.session.delete(company)
+    user = User.query.get(company.user_id)
+    if user:
+        db.session.delete(user)
+    db.session.commit()
+    flash('Company rejected and removed.', 'error')
+    return redirect(url_for('admin.manage_companies'))
 
 
-# @admin.route('/company/<int:company_id>/blacklist', methods=['POST'])
-# @login_required
-# @admin_required
-# def blacklist_company(company_id):
-#     company = Company.query.get_or_404(company_id)
-#     company.is_blacklisted = not company.is_blacklisted
-
-#     if company.is_blacklisted:
-#         # Cancel all open drives for this company
-#         PlacementDrive.query.filter_by(
-#             company_id=company_id, status='pending'
-#         ).update({'status': 'cancelled'})
-
-#     db.session.commit()
-#     state = 'blacklisted' if company.is_blacklisted else 'reinstated'
-#     flash(f'{company.company_name} {state}.', 'info')
-#     return redirect(url_for('admin.dashboard'))
+@admin.route('/blacklist_company/<int:company_id>')
+def blacklist_company(company_id):
+    company = Company.query.get_or_404(company_id)
+    company.is_blacklisted = not company.is_blacklisted
+    db.session.commit()
+    flash(f'{company.company_name} blacklist status updated.', 'success')
+    return redirect(url_for('admin.company_detail', company_id=company_id))
 
 
-# # ─── Student Management ──────────────────────────────────────────────────────
+@admin.route('/company/<int:company_id>')
+def company_detail(company_id):
+    company        = Company.query.get_or_404(company_id)
+    drives         = PlacementDrive.query.filter_by(company_id=company_id).all()
+    total_drives   = len(drives)
+    ongoing_drives = sum(1 for d in drives if not d.status)
+    students_hired = Application.query.join(PlacementDrive).filter(
+        PlacementDrive.company_id == company_id,
+        Application.status == 'shortlist'
+    ).count()
 
-# @admin.route('/student/<int:student_id>/blacklist', methods=['POST'])
-# @login_required
-# @admin_required
-# def blacklist_student(student_id):
-#     student = Student.query.get_or_404(student_id)
-#     student.is_blacklisted = not student.is_blacklisted
-#     db.session.commit()
-#     state = 'blacklisted' if student.is_blacklisted else 'reinstated'
-#     flash(f'{student.f_name} {student.l_name} {state}.', 'info')
-#     return redirect(url_for('admin.dashboard'))
+    if company.logo:
+        company.logo = company.logo.replace('\\', '/')
 
-
-# # ─── Drive Detail ─────────────────────────────────────────────────────────────
-
-# @admin.route('/drive/<int:drive_id>')
-# @login_required
-# @admin_required
-# def drive_detail(drive_id):
-#     drive = PlacementDrive.query.get_or_404(drive_id)
-#     company = Company.query.get(drive.company_id)
-#     applications = (
-#         db.session.query(Application, Student)
-#         .join(Student, Application.student_id == Student.student_id)
-#         .filter(Application.drive_id == drive_id)
-#         .all()
-#     )
-#     return render_template(
-#         'admin/drive.html',
-#         drive=drive,
-#         company=company,
-#         applications=applications,
-#     )
+    return render_template('admin/company_detail.html',
+        company        = company,
+        drives         = drives,
+        total_drives   = total_drives,
+        ongoing_drives = ongoing_drives,
+        students_hired = students_hired,
+    )
 
 
-# @admin.route('/drive/<int:drive_id>/complete', methods=['POST'])
-# @login_required
-# @admin_required
-# def mark_drive_complete(drive_id):
-#     drive = PlacementDrive.query.get_or_404(drive_id)
-#     drive.status = 'complete'
-#     db.session.commit()
-#     flash('Drive marked as complete.', 'success')
-#     return redirect(url_for('admin.drive_detail', drive_id=drive_id))
+#and drives
+@admin.route('/manage_drives')
+def manage_drives():
+    q             = request.args.get('q', '').strip()
+    drives_query  = PlacementDrive.query.join(Company)
+
+    if q:
+        drives_query = drives_query.filter(
+            db.or_(
+                PlacementDrive.drive_name.ilike(f'%{q}%'),
+                Company.company_name.ilike(f'%{q}%')
+            )
+        )
+
+    all_drives    = drives_query.all()
+    ongoing_drives = [d for d in all_drives if not d.status]
+    past_drives    = [d for d in all_drives if d.status]
+
+    return render_template('admin/manage_drive.html',
+        ongoing_drives = ongoing_drives,
+        past_drives    = past_drives,
+    )
 
 
-# # ─── Student Application History ─────────────────────────────────────────────
+@admin.route('/complete_drive/<int:drive_id>')
+def complete_drive(drive_id):
+    drive = PlacementDrive.query.get_or_404(drive_id)
+    drive.status = True
+    db.session.commit()
+    flash(f'{drive.drive_name} marked as complete.', 'success')
+    return redirect(url_for('admin.manage_drives'))
 
-# @admin.route('/student/<int:student_id>/applications')
-# @login_required
-# @admin_required
-# def student_applications(student_id):
-#     student = Student.query.get_or_404(student_id)
-#     applications = (
-#         db.session.query(Application, PlacementDrive, Company)
-#         .join(PlacementDrive, Application.drive_id == PlacementDrive.drive_id)
-#         .join(Company, PlacementDrive.company_id == Company.company_id)
-#         .filter(Application.student_id == student_id)
-#         .order_by(Application.applied_time.desc())
-#         .all()
-#     )
-#     return render_template(
-#         'admin/applications.html',
-#         student=student,
-#         applications=applications,
-#     )
+
+@admin.route('/drive/<int:drive_id>')
+def drive_detail(drive_id):
+    drive        = PlacementDrive.query.get_or_404(drive_id)
+    company      = Company.query.get_or_404(drive.company_id)
+    applications = Application.query.filter_by(drive_id=drive_id).all()
+
+    return render_template('admin/drive_detail.html',
+        drive        = drive,
+        company      = company,
+        applications = applications,
+    )
+
+
+#students chunk
+@admin.route('/manage_students')
+def manage_students():
+    q = request.args.get('q', '').strip()
+
+    if q:
+        students = Student.query.filter(
+            db.or_(
+                Student.f_name.ilike(f'%{q}%'),
+                Student.l_name.ilike(f'%{q}%'),
+                Student.phone.ilike(f'%{q}%'),
+                Student.student_id == q if q.isdigit() else False
+            )
+        ).all()
+    else:
+        students = Student.query.all()
+
+    return render_template('admin/manage_student.html', students=students)
+
+
+@admin.route('/blacklist_student/<int:student_id>')
+def blacklist_student(student_id):
+    student = Student.query.get_or_404(student_id)
+    student.is_blacklisted = not student.is_blacklisted
+    db.session.commit()
+    flash(f'{student.f_name} blacklist status updated.', 'success')
+    return redirect(url_for('admin.student_detail', student_id=student_id))
+
+
+@admin.route('/student/<int:student_id>')
+def student_detail(student_id):
+    student      = Student.query.get_or_404(student_id)
+    applications = Application.query.filter_by(student_id=student_id).all()
+
+    if student.resume:
+        student.resume = student.resume.replace('\\', '/')
+
+    return render_template('admin/student_detail.html',
+        student      = student,
+        applications = applications,
+    )
+
+
+
+# #--------------still onto it----------
+
+# def admin_required():
+#     if session.get('role') != 'admin':
+#         return redirect(url_for('auth.login'))
+#     return None

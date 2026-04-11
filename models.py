@@ -66,7 +66,10 @@ class PlacementDrive(db.Model):
     location = db.Column(db.String(150), nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     create_time = db.Column(db.DateTime, default=db.func.current_timestamp())
-    status = db.Column(db.String(8), default='pending') #pending, complete
+    status = db.Column(db.Boolean, default=False) #pending, complete
+
+
+    company = db.relationship('Company', backref='drives')
 
 
 
@@ -81,3 +84,7 @@ class Application(db.Model):
     applied_time = db.Column(db.DateTime, default=db.func.current_timestamp())
     status = db.Column(db.String(11), default='waiting')  # shortlist, waiting, reject
     remarks = db.Column(db.Text)
+
+
+    student = db.relationship('Student', backref='applications')
+    drive   = db.relationship('PlacementDrive', backref='applications')
