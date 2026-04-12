@@ -15,7 +15,7 @@
   {% endif %}
 
   <p>Email: {{ company.email }}</p>
-  <p>Website: {{ company.website }}</p>
+  <p>Website: <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
   <p>Description: {{ company.description }}</p>
   <p>HR Name: {{ company.hr_fname }} {{ company.hr_lname }}</p>
   <p>HR Email: {{ company.hr_email }}</p>

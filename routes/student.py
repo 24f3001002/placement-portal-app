@@ -7,6 +7,8 @@ from extensions import db
 
 from werkzeug.utils import secure_filename
 
+from datetime import datetime
+
 student = Blueprint('student', __name__)
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -19,6 +21,14 @@ def allowed_file(filename):
 #dashboard
 @student.route('/dashboard')
 def dashboard():
+    expired = PlacementDrive.query.filter(
+        PlacementDrive.deadline < datetime.now(),
+        PlacementDrive.status == False
+    ).all()
+    for d in expired:
+        d.status = True
+    db.session.commit()
+
     student_obj  = Student.query.filter_by(user_id=session.get('user_id')).first_or_404()
     applications = Application.query.filter_by(student_id=student_obj.student_id).all()
 

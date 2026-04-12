@@ -27,9 +27,10 @@
   <a href="{{ url_for('admin.blacklist_company', company_id=company.company_id) }}">
     {% if company.is_blacklisted %} Remove Blacklist {% else %} Blacklist {% endif %}
   </a>
-
+  
+  {% if company.approval_status %}
   <h2>Drives</h2>
-  <p>Total: {{ total_drives }} | Ongoing: {{ ongoing_drives }}</p>
+  <p>Total: {{ total_drives }} | Ongoing: {{ ongoing_drives }} | Students Hired: {{ students_hired }}</p>
   {% for d in drives %}
     <p>{{ loop.index }}. {{ d.drive_name }} | {{ d.job_title }} | Deadline: {{ d.deadline.strftime('%Y-%m-%d') }} |
       {% if d.status %} Completed {% else %} Ongoing {% endif %}
@@ -37,8 +38,7 @@
   {% else %}
     <p>No drives yet.</p>
   {% endfor %}
-
-  <p>Students Hired: {{ students_hired }}</p>
+  {% endif %}
 
 </body>
 </html>

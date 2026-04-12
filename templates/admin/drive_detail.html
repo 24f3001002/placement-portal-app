@@ -9,6 +9,9 @@
   <a href="{{ url_for('admin.manage_drives') }}">Back to Drives</a>
 
   <h1>{{ drive.drive_name }}</h1>
+  {% if company.logo %}
+  <img src="{{ url_for('static', filename=company.logo.replace('static/', '').replace('\\', '/')) }}" alt="Logo" width="80">
+  {% endif %}
   <p>Company: {{ company.company_name }}</p>
   <p>Job Title: {{ drive.job_title }}</p>
   <p>Description: {{ drive.job_description }}</p>
@@ -23,6 +26,7 @@
   {% endif %}
 
   <h2>Applications</h2>
+  <p>Total Applicants: {{ applications|length }}</p>
   {% for a in applications %}
     <p>
       {{ loop.index }}. {{ a.student.f_name }} {{ a.student.l_name }} |
